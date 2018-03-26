@@ -33,3 +33,5 @@
 
 *.tsv
 *.csv
+
+cmake-build-debug/
