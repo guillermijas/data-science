@@ -1,3 +1,3 @@
 # Data Science Project
 
-$ sudo apt install build-essential cmake
+$ g++ -std=c++11 main.cpp util.cpp util.h -o search 
