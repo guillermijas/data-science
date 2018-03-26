@@ -31,6 +31,9 @@
 *.out
 *.app
 
+*.tsv
+*.csv
 
+search
 cmake-build-debug/
 .idea/

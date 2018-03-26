@@ -4,6 +4,7 @@
 #include <iostream>
 #include <vector>
 
+
 namespace util{
     bool str_contains_lower(std::string str1, std::string str2);
     std::string str_tolower(std::string str);
