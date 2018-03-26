@@ -6,41 +6,60 @@
 #include "util.h"
 
 using namespace std;
-const char* TSV_PATH = "../incidents.tsv";
+const char* TSV_PATH = "incidents.tsv";
+const char* TSV_RESULT_PATH = "incidents_found.tsv";
 
-void search_data(const string &column, const string &value);
+void simple_search(const string &column, const string &value, const string &tsv_path = TSV_PATH);
+int column_position(const string &column);
 vector<string> tsv_header();
-void search_values(const string &search, unsigned long position);
-
-
-void save_results(vector<string> vector);
+void search_value(const string &value, int position, const string &tsv_path);
+void intersection_search(const vector<string> &params);
 
 int main(int argc, char* argv[]){
-  if(argc != 3)
-    cout << "Error. Try \"./search descript dog\"" << endl;
+  auto start = chrono::system_clock::now();
+
+  vector<string> params(argv + 1, argv + argc);
+  if (params.size() == 2)
+    simple_search(params.at(0), params.at(1));
+  else if (params.size() == 5 && params.at(2) == "or")
+    1+1; //union_search(params);
+  else if (params.size() == 5 && params.at(2) == "and")
+    intersection_search(params);
   else
-    search_data((string) argv[1], (string) argv[2]);
+    cout << "Error. Usage: \"" << argv[0] << " column1 value1 [(and/or) column2 value2]\"" << endl;
+
+  auto end = chrono::system_clock::now();
+  chrono::duration<double> elapsed_seconds = end - start;
+  cout << "Finished in " << elapsed_seconds.count() << " s." << endl;
+  cout << "You can see the results in 'incidents_found.tsv'" << endl;
 
   return 0;
 }
 
-void search_data(const string &column, const string &value){
-  vector<string> headers = tsv_header();
-  unsigned int i = 0;
-  bool found = false;
 
-  while(!found && i < headers.size()){
-    found = util::str_tolower(column) == util::str_tolower(headers.at(i));
-    i++;
-  }
-
-  if (found)
-    search_values(value, i-1);
-  else
+void simple_search(const string &column, const string &value, const string &tsv_path){
+  int column_pos = column_position(column);
+  if (column_pos > -1){
+    search_value(value, column_pos, tsv_path);
+  }else
     cout << "Column " << column << " not found." << endl;
 }
 
-vector<string> tsv_header(){
+int column_position(const string &column) {
+  vector<string> headers = tsv_header();
+  int i = 0;
+  bool found = false;
+
+  while(!found && i < headers.size()){
+    found = util::str_tolower(column) == util::str_tolower(headers[i]);
+    i++;
+  }
+
+  i = found ? i-1 : -1;
+  return i;
+}
+
+vector<string> tsv_header() {
   vector<string> columns;
   string row, value, token;
   ifstream file(TSV_PATH);
@@ -55,36 +74,39 @@ vector<string> tsv_header(){
 }
 
 
-
-void search_values(const string &search, unsigned long position){
-  string str, temp;
-  vector<string> values;
+void search_value(const string &value, int position, const string &tsv_path) {
+  string tsv_row, row_elem;
+  vector<string> vect_row;
   vector<string> matching_rows;
-  ifstream file(TSV_PATH);
+  ifstream file(tsv_path);
+  int rows_ctr = 0;
 
-  auto start = chrono::system_clock::now();
-
-  // Insert headers first
-  getline(file, str);
-  matching_rows.push_back(str);
+  // Insert header first
+  getline(file, tsv_row);
+  matching_rows.push_back(tsv_row);
 
   // Insert matching data
-  while(getline(file, str)) {
-    values.clear();
-    stringstream buffer(str);
-    while(getline(buffer, temp, '\t'))
-      values.push_back(util::str_tolower(temp));
+  while(getline(file, tsv_row)) {
+    vect_row.clear();
+    stringstream buffer(tsv_row);
+    while(getline(buffer, row_elem, '\t'))
+      vect_row.push_back(util::str_tolower(row_elem));
 
-    if(util::str_contains_lower(values.at(position), search))
-      matching_rows.push_back(str);
+    if(util::str_contains_lower(vect_row[position], value))
+      matching_rows.push_back(tsv_row);
+
+    rows_ctr++;
   }
 
   util::save_results(matching_rows);
 
-  auto end = chrono::system_clock::now();
-  chrono::duration<double> elapsed_seconds = end - start;
-
-  cout << matching_rows.size() <<" rows found in " << elapsed_seconds.count() << " s." << endl;
-  cout << "You can see the results in 'incidents_found.tsv'" << endl;
+  cout << "Processed rows: " << rows_ctr << endl;
+  cout << "Matching rows: " << matching_rows.size() << endl;
 }
 
+void intersection_search(const vector<string> &params) {
+  cout << "First condition: " << params[0] << " " << params[1] << endl;
+  simple_search(params[0], params[1]);
+  cout << "Second condition: " << params[3] << " " << params[4] << endl;
+  simple_search(params[3], params[4], TSV_RESULT_PATH);
+}
