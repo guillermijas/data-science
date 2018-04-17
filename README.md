@@ -15,7 +15,11 @@ Adicionalmente se ha creado un pequeño motor en C++ que lee filas de un archivo
 Para los motores NoSQL se han propuesto las siguientes búsquedas:
 
 &nbsp;&nbsp;&nbsp;&nbsp; - Distritos con mayor número de incidencias
+
 &nbsp;&nbsp;&nbsp;&nbsp; - Día de la semana con mayor número de incidencias
+
 &nbsp;&nbsp;&nbsp;&nbsp; - Incidencias que impliquen la acción de un perro (aparece "DOG" en el camp Descipt)
+
 &nbsp;&nbsp;&nbsp;&nbsp; - Las 5 categorías más frecuentes.
+
 &nbsp;&nbsp;&nbsp;&nbsp; - Porcentaje de incidencias sin resolución.
