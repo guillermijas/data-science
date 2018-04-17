@@ -10,3 +10,4 @@ Se utilizarán los siguientes motores de bases de datos NoSQL para el análisis:
 
 * Neo4j
 
+Adicionalmente se ha creado un pequeño motor en C++ que lee filas de un archivo CSV, principalmente para comparar el rendimiento y los resultados de las consultas.
