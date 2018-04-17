@@ -62,15 +62,18 @@ And now, we can try to find:
 * Every incident descripted as "violence"
 
 `> incidents.find({ Descript: { $regex: ".*VIOLENCE.*" }}).explain("executionStats");`
+
 Result: *{ "nReturned" : 18217, "executionTimeMillis" : 1880 }*
 
 * Every assault which took place on Monday
 
 `> incidents.find({ Category: "ASSAULT", DayOfWeek: "Monday" }).explain("executionStats");`
+
 Result: *{ "nReturned" : 26174, "executionTimeMillis" : 799 }*
 
 * Every incident registered on weekend (Saturday or Sunday)
 
 `> incidents.find({ $or: [{ DayOfWeek: "Saturday"}, {DayOfWeek: "Sunday" }]}).explain("executionStats");`
+
 Result: *{ "nReturned" : 603259, "executionTimeMillis" : 1091 }*
 
