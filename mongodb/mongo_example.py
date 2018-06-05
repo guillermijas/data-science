@@ -5,6 +5,8 @@ import sys
 sys.path.insert(0,'..')
 import pymongo
 from pymongo import MongoClient
+import folium
+from folium import plugins
 
 print('Mongo version', pymongo.__version__)
 client = MongoClient('localhost', 27017)
@@ -53,3 +55,10 @@ aggResult5 = collection.aggregate(no_resolution)
 no_res = pd.DataFrame(list(aggResult5))
 print("Contador: ", no_res["_id"].size)
 
+def mapa_calor(dataframe):
+    mapa = folium.Map(location=[37.778254811523, -122.405834032593], tiles='openstreetmap')
+    mapa.add_child(plugins.HeatMap([[row["Y"], row["X"]] for name, row in dataframe.iterrows()]))
+    mapa.save('mapa_calor_incidencias.html')
+    return mapa
+
+mapa_calor(dog_no_res)
